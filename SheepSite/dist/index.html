@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Three.js - Background Cubemap</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<canvas id="c"></canvas>
+<!-- partial file:///   <script type="module" src="https://res.cloudinary.com/bagcal/raw/upload/v1634896389/script_oapnvm.js"></script>
+ -->
+ <script type="module">
+ 	
+ 	// Three.js - Background Cubemap
+// from https://threejsfundamentals.org/threejs/threejs-background-cubemap.html
+
+
+import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/build/three.module.js';
+import {OrbitControls} from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/controls/OrbitControls.js';
+import {GLTFLoader} from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/GLTFLoader.js';
+import {DRACOLoader} from 'https://threejsfundamentals.org/threejs/resources/threejs/r132/examples/jsm/loaders/DRACOLoader.js';
+//import {FBXLoader} from 'https://cdn.jsdelivr.net/npm/three@0.118.1/examples/jsm/loaders/FBXLoader.js';
+
+function main() {
+  const canvas = document.querySelector('#c');
+  const renderer = new THREE.WebGLRenderer({canvas});
+
+  const fov = 75;
+  const aspect = 2;  // the canvas default
+  const near = 0.1;
+  const far = 100;
+  const camera = new THREE.PerspectiveCamera(50, 5, near, 2000);
+  camera.position.z = 3;
+
+  
+
+  const controls = new OrbitControls(camera, canvas);
+  controls.target.set(0, -0.5, 0);
+  controls.update();
+  
+  const scene = new THREE.Scene();
+
+  {
+    const color = 0xFFFFFF;
+    const intensity = 1;
+    const light = new THREE.DirectionalLight(color, intensity);
+    light.position.set(-1, -7, 4);
+    scene.add(light);
+    const color2 = 0xFFB6C1;
+    const light2 = new THREE.DirectionalLight(color2, intensity);
+
+    light.position.set(-1, 0, 10);
+    scene.add(light2);
+  }
+
+
+  const boxWidth = 1;
+  const boxHeight = 1;
+  const boxDepth = 1;
+ 
+
+
+
+ 
+
+  {
+    const loader1 = new THREE.CubeTextureLoader();
+    const texture = loader1.load([
+      'https://res.cloudinary.com/bagcal/image/upload/v1634893552/snowalps_lf_e9ycdy.png',
+      'https://res.cloudinary.com/bagcal/image/upload/v1634893552/snowalps_rt_vnatkm.png',
+      'https://res.cloudinary.com/bagcal/image/upload/v1634895401/snowalps_up_ki0tgr.png',
+      'https://res.cloudinary.com/bagcal/image/upload/a_270/v1634893552/snowalps_dn_utdez6.png',
+      'https://res.cloudinary.com/bagcal/image/upload/v1634893552/snowalps_ft_xpldil.png',
+      'https://res.cloudinary.com/bagcal/image/upload/v1634893552/snowalps_bk_zqn7ry.png',
+    ]);
+    scene.background = texture;
+
+  }
+
+
+   { // begin lod
+   	const dRACOLoader = new DRACOLoader();
+    const loader = new GLTFLoader();
+    dRACOLoader.setDecoderPath( 'https://www.gstatic.com/draco/versioned/decoders/1.4.1/' );
+    loader.setDRACOLoader(dRACOLoader)
+    loader.load('https://res.cloudinary.com/bagcal/image/upload/v1634926068/shep2_pnzqrf.glb', (gltf) => {
+      gltf.scene.traverse(c => {
+        c.castShadow = true;
+      });
+      gltf.scene.scale.setScalar(5);
+      gltf.scene.position.y = 0;
+      gltf.scene.position.z = -5;
+     
+      scene.add(gltf.scene);
+    });
+    
+
+  } // end lod
+
+  function resizeRendererToDisplaySize(renderer) {
+    const canvas = renderer.domElement;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const needResize = canvas.width !== width || canvas.height !== height;
+    if (needResize) {
+      renderer.setSize(width, height, false);
+    }
+    return needResize;
+  }
+
+  function render(time) {
+    time *= 0.001;
+
+    if (resizeRendererToDisplaySize(renderer)) {
+      const canvas = renderer.domElement;
+      camera.aspect = canvas.clientWidth / canvas.clientHeight;
+      camera.updateProjectionMatrix();
+    }
+
+   
+    
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+}
+
+main();
+
+ </script>
+ 
+</body>
+</html>
